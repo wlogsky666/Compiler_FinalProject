@@ -1,74 +1,52 @@
 %{
 #include "y.tab.h"
-#include <math.h>
+
 %}
 
-var [a-zA-Z][a-zA-Z0-9]*
 
 %%
 [ \t] ;
-[\n] { ++num_lines; }
+[\n] ;
 \%\%.*\n ;		// Comment
 
 
-[Bb][Ee][Gg][Ii][Nn] 	{return 1;} 
-[Ee][Nn][Dd] 		{return 2;}
-[Rr][Ee][Aa][Dd] 	{return 3;}
-[Ww][Rr][Ii][Tt][Ee] 	{return 4;}
+[Pp][Rr][Oo][Gg][Rr][Aa][Mm]    {return PROGRAM;}
+[Bb][Ee][Gg][Ii][Nn] 	{return BEGINT;} 
+[Ee][Nn][Dd] 		{return END;}
 
-(IF)|(if) 		{return 25;}
-(THEN)|(then) 		{return 26;}
-(ELSE)|(else) 		{return 27;}
-(ENDIF)|(endif) 	{return 28;}
-(FOR)|(for) 		{return 29;}
-(TO)|(to) 		{return 30;}
-(ENDFOR)|(endfor) 	{return 31;}
-(WHILE)|(while) 	{return 32;}
-(ENDWHILE)|(endwhile)	{return 33;}
-(DECLARE)|(declare) 	{return 34;}
-(AS)|(as)		{return 35;}
-(INTERGER)|(interger)	{return 36;}
-(REAL)|(real)		{return 37;}
-(EOF)			{return 38;}
+[Dd][Ee][Cc][Ll][Aa][Rr][Ee]	{return DECLARE;}
+[Aa][Ss]    {return AS;}
+[Ii][Ff]    {return IF;}
+[Tt][Hh][Ee][Nn]    {return THEN;}
+[Ee][Ll][Ss][Ee]    {return ELSE;}
+[Ee][Nn][Dd][Ii][Ff]    {return ENDIF;}
+[Ff][Oo][Rr]    {return FOR;}
+[Tt][Oo]    {return TO;}
+[Dd][Oo][Ww][Nn][Tt][Oo]    {return DOWNTO;}
+[Ee][Nn][Dd][Ff][Oo][Rr]    {return ENDFOR;}
+[Ww][Hh][Ii][Ll][Ee]    {return WHILE;}
+[Ee][Nn][Dd][Ww][Hh][Ii][Ll][Ee]    {return ENDWHILE;}
+[Ss][Tt][Ee][Pp]	{ return STEP;}
+
+[Ii][Nn][Tt][Ee][Gg][Ee][Rr] { strcpy(yylval.varname, yytext); return VARTYPE; }
+[Ff][Ll][Oo][Aa][Tt]    { strcpy(yylval.varname, yytext); return VARTYPE; }
+":=" {return ASSIGN;}
+"!=" {return NE;}
+">" {return G;}
+"<" {return L;}
+">=" {return GE;}
+"<=" {return LE;}
+"==" {return EQ;}
 
 
-{var} {return 5;} 
-[0-9]+ {return 6;}
-([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+) {return 7;}
-([0-9]+(\.)?[0-9]*)([Ee]-?[0-9]+)  {return 8;}
-\"[^"\n]*["\n] {return 9;}
+[a-zA-Z][a-zA-Z0-9_]* {	strcpy(yylval.varname,yytext);	return NAME;} 
+[0-9]+ { yylval.val = atof(yytext);	return NUMBER;}
+([0-9]+\.[0-9]*)|([0-9]*\.[0-9]+) { yylval.val = atof(yytext); return NUMBER;}
 
-[(] {return 10;}   
-[)] {return 11;}
-[;] {return 12;}
-[,] {return 13;}
-:=  {return 14;}
-[+] {return 15;}
-[-] {return 16;}
-[*] {return 17;}
-[/] {return 18;}
-!=  {return 19;}
-[>] {return 20;}
-[<] {return 21;}
->=  {return 22;}
-\<= {return 23;}
-==  {return 24;}
+
 
 .  {return yytext[0];}
 
 %%
 
-main(int argc, char* argv[]){
-	FILE* fp = fopen(argv[1], "r");
-	yyin = fp;
-	
-	int i;
-	while( i = yylex() ){
-		if( i != -1 )
-			printf("Token number = %-2d, value is %s\n", i, yytext);
-		else
-			printf("Unknown Token, value is %s\n", yytext);	
-	}
-	printf("\nEnd of the execution\n");
-	fclose(fp);
-}
+
